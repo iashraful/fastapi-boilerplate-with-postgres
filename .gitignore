@@ -1,0 +1,7 @@
+__pycache__/*
+*.pyc
+.vscode
+.idea
+venv
+.DS_store
+postgres_data

@@ -1,0 +1,38 @@
+version: "3.7"
+
+services:
+  db:
+    image: postgres:13.4-alpine
+    restart: always
+    container_name: fastapi_boilerplate_db
+    env_file:
+      - ./.env
+    expose:
+      - 5432
+    ports:
+      - "5440:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data/
+
+  backend:
+    build: ./
+    restart: always
+    container_name: fastapi_boilerplate_backend
+    command: sh -c "uvicorn main:app --host=0.0.0.0 --reload"
+    working_dir: /app
+    env_file:
+      - ./.env
+    volumes:
+      - ./:/app:cached
+    expose:
+      - 8000 
+    ports:
+      - "7000:8000"
+    depends_on:
+      - db
+
+  redis:
+    image: redis:alpine
+    container_name: fastapi_boilerplate_redis
+    expose:
+      - 6379
