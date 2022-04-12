@@ -25,7 +25,7 @@ services:
     volumes:
       - ./:/app:cached
     expose:
-      - 8000 
+      - 8000
     ports:
       - "7000:8000"
     depends_on:
