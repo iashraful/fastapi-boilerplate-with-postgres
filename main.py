@@ -1,5 +1,6 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+from core.database import get_db
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="FastAPI Boilerplate API Documentation")
@@ -16,7 +17,7 @@ app.add_middleware(
 
 
 @app.get("/")
-def read_root():
+def read_root(db = Depends(get_db)):
     return {"Hello": "World"}
 
 

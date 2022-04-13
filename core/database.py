@@ -20,4 +20,5 @@ async def get_db():
         yield db
     finally:
         if db:
-            db.close()
+            await db.bind.dispose()
+            await db.close()
