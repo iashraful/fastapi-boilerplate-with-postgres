@@ -36,6 +36,8 @@ services:
     container_name: fastapi_boilerplate_redis
     expose:
       - 6379
+    ports:
+      - "6390:6379"
 
   celery_worker:
     restart: always

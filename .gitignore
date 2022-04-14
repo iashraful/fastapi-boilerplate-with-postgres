@@ -7,3 +7,4 @@ venv
 .DS_store
 postgres_data
 alembic.ini
+.pytest_cache

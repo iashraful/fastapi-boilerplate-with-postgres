@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from core.config import settings
 
 engine = create_async_engine(settings.DB_CONN_STRING, echo=True)
-LocalSession = sessionmaker(
+DBClient = sessionmaker(
     autocommit=False,
     autoflush=False,
     bind=engine,
@@ -16,7 +16,7 @@ LocalSession = sessionmaker(
 async def get_db():
     db = None
     try:
-        db = LocalSession()
+        db = DBClient()
         yield db
     finally:
         if db:
