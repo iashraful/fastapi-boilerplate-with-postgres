@@ -11,7 +11,3 @@ class User(ModelBase):
     is_active = Column(Boolean, default=False)
     email_verified = Column(Boolean, default=False)
     is_superuser = Column(Boolean, default=False)
-
-    @classmethod
-    def get_table_name(cls, make_plural=True):
-        return "users"

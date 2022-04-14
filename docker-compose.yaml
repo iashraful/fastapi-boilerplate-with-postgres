@@ -36,3 +36,16 @@ services:
     container_name: fastapi_boilerplate_redis
     expose:
       - 6379
+
+  celery_worker:
+    restart: always
+    container_name: fastapi_boilerplate_celery_worker
+    volumes:
+      - ./:/app
+    build:
+      context: .
+    env_file:
+      - .env
+    command: celery -A core.celery worker --loglevel=INFO
+    depends_on:
+      - redis
