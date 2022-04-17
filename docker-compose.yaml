@@ -48,6 +48,6 @@ services:
       context: .
     env_file:
       - .env
-    command: celery -A core.celery worker --loglevel=INFO
+    command: python -m celery -A core.celery worker --loglevel=INFO
     depends_on:
       - redis

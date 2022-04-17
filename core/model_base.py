@@ -1,4 +1,6 @@
+from datetime import datetime
 from typing import Dict, Any
+from sqlalchemy import Column, DateTime
 
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
@@ -8,8 +10,11 @@ class_registry: Dict = {}
 
 @as_declarative(class_registry=class_registry)
 class ModelBase:
-    id: Any
     __name__: str
+
+    id: Any
+    created_at: datetime = Column(DateTime)
+    updated_at: datetime = Column(DateTime)
 
     @classmethod
     def get_table_name(cls, make_plural: bool = True):
