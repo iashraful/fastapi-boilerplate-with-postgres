@@ -5,7 +5,7 @@ from app.auth.schema.v1.user_schema import UserCreateSchema, UserSchema
 from app.auth.utils import get_password_hash
 from core.database import DBClient
 from core.exceptions import DoesNotExistError
-from core.orm.repo import BaseSQLAlchemyRepo
+from core.orm import BaseSQLAlchemyRepo
 
 
 class UserRepo(BaseSQLAlchemyRepo):

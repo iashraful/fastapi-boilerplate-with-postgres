@@ -21,10 +21,19 @@ class UserView:
 
     @staticmethod
     async def create(user_data: UserCreateSchema, db: DBClient = Depends(get_db)):
-        user_repo = UserRepo(db=db)
-        user: UserSchema = await user_repo.create_user(user_data=user_data)
-        return UserResponse(
-            code=status.HTTP_201_CREATED,
-            msg="User created successfully.",
-            data=user,
-        )
+        try:
+            user_repo = UserRepo(db=db)
+            user: UserSchema = await user_repo.create_user(user_data=user_data)
+            return UserResponse(
+                code=status.HTTP_201_CREATED,
+                msg="User created successfully.",
+                data=user,
+            )
+        except DoesNotExistError as err:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=err.__str__()
+            )
+        except Exception as err:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=err.__str__()
+            )
