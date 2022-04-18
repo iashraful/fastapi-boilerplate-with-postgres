@@ -39,7 +39,7 @@ class UserView:
         user = User(**_user_dict)
         db.add(user)
         await db.commit()
-        db.refresh(user)
+        await db.refresh(user)
         return UserResponse(
             code=status.HTTP_201_CREATED,
             msg="User created successfully.",

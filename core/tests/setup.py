@@ -1,64 +1,60 @@
 import asyncio
-import pytest
-import sqlalchemy
-from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
+import pytest
+from core.config import settings
 from core.database import get_db
 from core.model_base import ModelBase
+from fastapi.testclient import TestClient
 from main import app
-from core.config import settings
+from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
-event_loop = asyncio.get_event_loop()
+loop = asyncio.get_event_loop()
 
 
-async def create_engine():
-    engine = create_async_engine(settings.TESTING_DB_CONN_STRING, echo=True)
+async def create_fresh_tables(engine):
     async with engine.begin() as conn:
         await conn.run_sync(ModelBase.metadata.drop_all)
         await conn.run_sync(ModelBase.metadata.create_all)
-    return engine
 
 
-@pytest.fixture()
-def session():
-    engine = event_loop.run_until_complete(create_engine())
-    connection = event_loop.run_until_complete(engine.connect())
-    transaction = connection.begin()
-    TestingDBClient = sessionmaker(
+def drop_and_create_db():
+    # Creating another engine is not redundency. It's necessary for avoiding the anyio error.
+    # RuntimeError: Task <Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=<BlockingPortal._call_func()
+    engine = create_engine(url=settings.SYNC_TESTING_DB_CONN_STRING)
+    ModelBase.metadata.drop_all(bind=engine)
+    ModelBase.metadata.create_all(bind=engine)
+
+
+def setup_test_db():
+    engine = create_async_engine(settings.ASYNC_TESTING_DB_CONN_STRING, echo=True)
+    TestAsyncSession = sessionmaker(
         autocommit=False,
         autoflush=False,
         bind=engine,
         expire_on_commit=False,
         class_=AsyncSession,
     )
-    session = TestingDBClient(bind=connection)
+    drop_and_create_db()
+    return TestAsyncSession()
 
-    # Begin a nested transaction (using SAVEPOINT).
-    nested = connection.begin_nested()
 
-    # If the application code calls session.commit, it will end the nested
-    # transaction. Need to start a new one when that happens.
-    @sqlalchemy.event.listens_for(session, "after_transaction_end")
-    def end_savepoint(session, transaction):
-        nonlocal nested
-        if not nested.is_active:
-            nested = connection.begin_nested()
-
+@pytest.fixture()
+def session():
+    session = setup_test_db()
     yield session
-
-    # Rollback the overall transaction, restoring the state before the test ran.
-    session.close()
-    transaction.rollback()
-    connection.close()
 
 
 @pytest.fixture()
 def client(session):
-    def override_get_db():
-        yield session
+    async def override_get_db():
+        try:
+            yield session
+        finally:
+            print("Closing Connection")
+            await session.bind.dispose()
+            await session.close()
 
     app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
@@ -67,4 +63,18 @@ def client(session):
 
 @pytest.fixture()
 def auth_token(client):
-    pass
+    user_create_response = client.post(
+        "/api/v1/users",
+        json={
+            "name": "Tester",
+            "email": "tester@mail.com",
+            "password": "1234",
+            "confirm_password": "1234",
+        },
+    )
+    if user_create_response.status_code == 200:
+        response = client.post(
+            "/api/auth-token", json={"email": "tester@mail.com", "password": "1234"}
+        )
+        if response.status_code == 200:
+            yield response.json()["data"]["auth_token"]

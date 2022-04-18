@@ -20,7 +20,10 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_HOURS: int = config("REFRESH_TOKEN_EXPIRE_HOURS", default=2)
 
     DB_CONN_STRING: str = config("DB_CONN_STRING")
-    TESTING_DB_CONN_STRING: str = config("TESTING_DB_CONN_STRING", default="")
+    ASYNC_TESTING_DB_CONN_STRING: str = config(
+        "ASYNC_TESTING_DB_CONN_STRING", default=""
+    )
+    SYNC_TESTING_DB_CONN_STRING: str = config("SYNC_TESTING_DB_CONN_STRING", default="")
 
     TIMEZONE: str = config("TIMEZONE", default="Asia/Dhaka")
 
