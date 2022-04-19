@@ -1,9 +1,7 @@
 from app.auth.schema.common import UserTokenPayloadSchema
 from app.auth.schema.token import (
-    LoginResponse,
     LoginResponseData,
     RefreshTokenDataSchema,
-    RefreshTokenResponse,
     RefreshTokenSchema,
     UserLoginSchema,
 )
@@ -14,6 +12,7 @@ from app.auth.utils import (
     create_refresh_token,
 )
 from core.database import DBClient, get_db
+from core.responses import BaseResponse
 from fastapi import Depends, HTTPException, status
 
 
@@ -21,7 +20,7 @@ class AuthTokenView:
     @staticmethod
     async def auth_token(
         data: UserLoginSchema, db: DBClient = Depends(get_db)
-    ) -> LoginResponse:
+    ) -> BaseResponse:
         user_instance = await authenticate(
             email=data.email, password=data.password, db=db
         )
@@ -35,7 +34,7 @@ class AuthTokenView:
             response_schema = LoginResponseData(
                 auth_token=auth_token, refresh_token=refresh_token, token_type="Bearer"
             )
-            return LoginResponse(
+            return BaseResponse(
                 code=status.HTTP_200_OK,
                 msg="Login successful.",
                 data=response_schema,
@@ -47,7 +46,7 @@ class AuthTokenView:
         )
 
     @staticmethod
-    async def refresh_token(token: RefreshTokenSchema) -> RefreshTokenResponse:
+    async def refresh_token(token: RefreshTokenSchema) -> BaseResponse:
         auth_token, new_refresh_token = create_from_refresh_token(
             token=token.refresh_token
         )
@@ -56,7 +55,7 @@ class AuthTokenView:
             auth_token=auth_token,
             refresh_token=new_refresh_token,
         )
-        return RefreshTokenResponse(
+        return BaseResponse(
             msg="Refresh token created successfully.",
             code=status.HTTP_200_OK,
             data=data,

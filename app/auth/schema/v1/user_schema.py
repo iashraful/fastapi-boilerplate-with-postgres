@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 
-from core.schema import BaseCreateSchema, BaseResponse, DateTimeShema
+from core.schema import BaseCreateSchema, BaseResponseDataSchema, DateTimeShema
 
 
 class UserCreateSchema(BaseCreateSchema):
@@ -16,7 +16,3 @@ class UserSchema(DateTimeShema):
     is_active: bool
     is_superuser: bool
     email_verified: bool
-
-
-class UserResponse(BaseResponse):
-    data: UserSchema

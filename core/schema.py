@@ -4,7 +4,7 @@ from typing import Any, Optional
 from pydantic import BaseModel
 
 
-class BaseResponse(BaseModel):
+class BaseResponseDataSchema(BaseModel):
     code: int
     msg: str
     data: Optional[Any]
@@ -30,7 +30,7 @@ class ErrorDataSchema(BaseModel):
     details: Optional[Any]
 
 
-class ErrorResponseSchema(BaseResponse):
+class ErrorResponseSchema(BaseResponseDataSchema):
     msg: str
     code: int = status.HTTP_500_INTERNAL_SERVER_ERROR
     data: Optional[ErrorDataSchema]

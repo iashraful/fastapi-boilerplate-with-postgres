@@ -1,13 +1,14 @@
+from fastapi.responses import JSONResponse
 from app.auth.repo import UserRepo
 from app.auth.schema.v1.user_schema import (
     UserCreateSchema,
-    UserResponse,
     UserSchema,
 )
 from app.auth.utils import request_user
 from core.database import DBClient, get_db
 from core.exceptions import DoesNotExistError
-from core.schema import BaseResponse
+from core.responses import BaseResponse
+from core.schema import BaseResponseDataSchema
 from fastapi import Depends, HTTPException, status
 
 
@@ -25,7 +26,7 @@ class UserView:
         try:
             user_repo = UserRepo(db=db)
             user: UserSchema = await user_repo.create_user(user_data=user_data)
-            return UserResponse(
+            return BaseResponse(
                 code=status.HTTP_201_CREATED,
                 msg="User created successfully.",
                 data=user,
