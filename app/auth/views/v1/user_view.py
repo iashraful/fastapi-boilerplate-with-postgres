@@ -1,17 +1,18 @@
-import email
-from fastapi import Depends, HTTPException, status
-from sqlalchemy import select
-from app.auth.models import User
 from app.auth.repo import UserRepo
-from app.auth.schema.v1.user_schema import UserCreateSchema, UserResponse, UserSchema
-from app.auth.utils import get_password_hash, request_user
+from app.auth.schema.v1.user_schema import (
+    UserCreateSchema,
+    UserResponse,
+    UserSchema,
+)
+from app.auth.utils import request_user
 from core.database import DBClient, get_db
 from core.exceptions import DoesNotExistError
 from core.schema import BaseResponse
+from fastapi import Depends, HTTPException, status
 
 
 class UserView:
-    @classmethod
+    @staticmethod
     async def me(db: DBClient = Depends(get_db), current_user=Depends(request_user)):
         return BaseResponse(
             code=status.HTTP_200_OK,

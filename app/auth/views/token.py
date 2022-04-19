@@ -1,4 +1,3 @@
-from fastapi import Depends, HTTPException, status
 from app.auth.schema.common import UserTokenPayloadSchema
 from app.auth.schema.token import (
     LoginResponse,
@@ -15,6 +14,7 @@ from app.auth.utils import (
     create_refresh_token,
 )
 from core.database import DBClient, get_db
+from fastapi import Depends, HTTPException, status
 
 
 class AuthTokenView:

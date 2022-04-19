@@ -1,12 +1,13 @@
-from pydantic import ValidationError
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import ValidationError
+
+from app.auth.routes import auth_router, user_router
 from core.config import settings
 from core.database import get_db
-from fastapi.middleware.cors import CORSMiddleware
-from app.auth.routes import auth_router, user_router
 from core.schema import BaseResponse
-from fastapi.responses import JSONResponse
 
 app = FastAPI(title="FastAPI Boilerplate API Documentation")
 
@@ -52,7 +53,3 @@ def read_root(db=Depends(get_db)):
 # Includes all the urls here
 app.include_router(auth_router, prefix="/api")
 app.include_router(user_router, prefix=settings.API_V1_PREFIX)
-
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, access_log=True)
