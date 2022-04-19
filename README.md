@@ -9,6 +9,7 @@
 * Testing with a real database along with setup and tear down approch
 * Celery worker support (celery beat can be configured easily.)
 * Repository based ORM writing for better abstraction
+* Logging support
 
 ### How to run [Docker & Docker Compose]
 * Copy the `.env.example` and create `.env` file.
