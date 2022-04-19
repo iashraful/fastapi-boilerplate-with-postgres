@@ -35,5 +35,8 @@ class UserView:
             )
         except Exception as err:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=err.__str__()
+                status_code=getattr(
+                    err, "status_code", status.HTTP_500_INTERNAL_SERVER_ERROR
+                ),
+                detail=getattr(err, "detail", err.__str__()),
             )

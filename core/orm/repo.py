@@ -1,4 +1,4 @@
-from typing import Any, Optional, Tuple, Type
+from typing import Optional, Tuple, Type
 
 from sqlalchemy import select
 from core.database import DBClient
