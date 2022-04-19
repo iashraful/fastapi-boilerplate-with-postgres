@@ -29,7 +29,7 @@ if settings.CORS_ORIGINS:
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     logger.info(f"Error happened:  {exc.detail}")
-    _error_response = BaseResponseDataSchema(msg=exc.detail, code=exc.status_code)
+    _error_response = BaseResponseDataSchema(msg=str(exc.detail), code=exc.status_code)
     return JSONResponse(
         status_code=exc.status_code,
         content=_error_response.dict(),

@@ -72,7 +72,7 @@ def auth_token(client):
             "confirm_password": "1234",
         },
     )
-    if user_create_response.status_code == 200:
+    if user_create_response.status_code == 201:
         response = client.post(
             "/api/auth-token", json={"email": "tester@mail.com", "password": "1234"}
         )

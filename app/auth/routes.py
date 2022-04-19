@@ -19,4 +19,5 @@ user_router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 user_router.add_api_route("/me", UserView.me, methods=["GET"])
+user_router.add_api_route("/users", UserView.list, methods=["GET"])
 user_router.add_api_route("/users", UserView.create, methods=["POST"])

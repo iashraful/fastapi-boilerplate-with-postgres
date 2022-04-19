@@ -1,10 +1,15 @@
-from typing import Optional, Tuple, Type
+from typing import List, Optional, Tuple, Type, Union
 
 from sqlalchemy import select
 from core.database import DBClient
 
 from core.model_base import ModelBase
+from core.config import settings
 from .base_repo import AbstractRepository
+import logging
+
+
+logger = logging.getLogger(settings.PROJECT_NAME)
 
 
 class BaseSQLAlchemyRepo(AbstractRepository):
@@ -13,16 +18,19 @@ class BaseSQLAlchemyRepo(AbstractRepository):
         self._model = model
         self._session = db
 
-    async def get(self, filters: Optional[Tuple]) -> dict:
-        try:
-            statement = select(self._model).filter(*filters)
-            result = await self._session.execute(statement)
-            return result.scalars().first().__dict__
-        except Exception as err:
-            print(err)
+    async def get(self, filters: Optional[Tuple] = ()) -> Union[dict, None]:
+        statement = select(self._model).filter(*filters)
+        result = await self._session.execute(statement)
+        data = result.scalars().first()
+        return data.__dict__ if data else None
 
-    async def list(self, query: dict, limit: Optional[int] = None):
-        raise NotImplementedError
+    async def list(
+        self, filters: Optional[Tuple] = (), limit: Optional[int] = None
+    ) -> List[dict]:
+        statement = select(self._model).filter(*filters)
+        result = await self._session.execute(statement)
+        data = result.scalars().fetchall()
+        return [d.__dict__ for d in data]
 
     async def create(self, data: dict) -> dict:
         instance = self._model(**data)

@@ -18,5 +18,5 @@ def test_create_user(client, auth_token):
             "confirm_password": "1234",
         },
     )
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json()["data"]["email"] == "johndoe@mail.com"

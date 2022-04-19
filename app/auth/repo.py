@@ -1,4 +1,5 @@
 import logging
+from typing import List
 from fastapi import HTTPException, status
 from pydantic import EmailStr
 from app.auth.models import User
@@ -47,3 +48,8 @@ class UserRepo(BaseSQLAlchemyRepo):
         user: dict = await self.create(data=_user_dict)
         logger.info("User Created.")
         return UserSchema(**user)
+
+    async def list_users(self) -> List[UserSchema]:
+        logger.info("Fetching users from db.")
+        result: List[UserSchema] = await self.list()
+        return [UserSchema(**res) for res in result]
