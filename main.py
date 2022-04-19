@@ -1,15 +1,18 @@
-import uvicorn
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+from logging.config import dictConfig
+import logging
+from core.logger import LogConfig
 
 from app.auth.routes import auth_router, user_router
 from core.config import settings
-from core.database import get_db
 from core.schema import BaseResponseDataSchema
 
-app = FastAPI(title="FastAPI Boilerplate API Documentation")
+app = FastAPI(title=settings.PROJECT_NAME)
+dictConfig(LogConfig().dict())
+logger = logging.getLogger(settings.PROJECT_NAME)
 
 
 # Register CORS
@@ -25,6 +28,7 @@ if settings.CORS_ORIGINS:
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
+    logger.info(f"Error happened:  {exc.detail}")
     _error_response = BaseResponseDataSchema(msg=exc.detail, code=exc.status_code)
     return JSONResponse(
         status_code=exc.status_code,
@@ -34,6 +38,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 @app.exception_handler(ValidationError)
 async def validation_error_exception_handler(request: Request, exc: ValidationError):
+    logger.info(f"Found a validation error. {exc.errors()}")
     _error_response = BaseResponseDataSchema(
         msg="Invalid data found.",
         code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -46,7 +51,7 @@ async def validation_error_exception_handler(request: Request, exc: ValidationEr
 
 
 @app.get("/")
-def read_root(db=Depends(get_db)):
+def read_root():
     return {"Hello": "World"}
 
 

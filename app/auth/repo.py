@@ -1,3 +1,4 @@
+import logging
 from fastapi import HTTPException, status
 from pydantic import EmailStr
 from app.auth.models import User
@@ -6,6 +7,9 @@ from app.auth.utils import get_password_hash
 from core.database import DBClient
 from core.exceptions import DoesNotExistError
 from core.orm import BaseSQLAlchemyRepo
+from core.config import settings
+
+logger = logging.getLogger(settings.PROJECT_NAME)
 
 
 class UserRepo(BaseSQLAlchemyRepo):
@@ -13,12 +17,14 @@ class UserRepo(BaseSQLAlchemyRepo):
         super(UserRepo, self).__init__(model=User, db=db)
 
     async def get_by_email(self, email: EmailStr) -> User:
+        logger.info(f"Retriving user by email: {email}")
         result = await self.get(filters=(User.email == email,))
         if not result:
             raise DoesNotExistError("User with this email does not exist.")
         return result
 
     async def create_user(self, user_data: UserCreateSchema) -> UserSchema:
+        logger.info("Creating user.")
         try:
             user_exist = await self.get_by_email(email=user_data.email)
             if user_exist:
@@ -39,4 +45,5 @@ class UserRepo(BaseSQLAlchemyRepo):
         _user_dict["hashed_password"] = _hashed_password
         _user_dict["is_active"] = True
         user: dict = await self.create(data=_user_dict)
+        logger.info("User Created.")
         return UserSchema(**user)

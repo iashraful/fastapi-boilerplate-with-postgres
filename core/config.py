@@ -7,6 +7,9 @@ from decouple import config
 class Settings(BaseSettings):
     PROJECT_NAME: str = "FastAPI Boilerplate"
     BASE_DIR: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    LOG_LEVEL: str = config("LOG_LEVEL", "INFO")
+    LOG_FORMAT: str = config("LOG_FORMAT", "%(asctime)s - %(levelname)s - %(message)s")
+
     API_V1_PREFIX: str = "/api/v1"
     SECRET_KEY: str = config("SECRET_KEY")
     # CORS_ORIGINS is a JSON-formatted list of origins
