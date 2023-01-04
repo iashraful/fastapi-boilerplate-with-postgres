@@ -18,7 +18,7 @@ services:
     build: ./
     restart: always
     container_name: fastapi_boilerplate_backend
-    command: sh -c "uvicorn main:app --host=0.0.0.0 --reload"
+    command: sh -c "alembic upgrade head && uvicorn main:app --host=0.0.0.0 --reload"
     working_dir: /app
     env_file:
       - ./.env
@@ -49,5 +49,18 @@ services:
     env_file:
       - .env
     command: python -m celery -A core.celery worker --loglevel=INFO
+    depends_on:
+      - redis
+
+  celery_beat:
+    restart: always
+    container_name: fastapi_boilerplate_celery_beat
+    volumes:
+      - ./:/app
+    build:
+      context: .
+    env_file:
+      - .env
+    command: python -m celery -A core.celery beat --loglevel=INFO
     depends_on:
       - redis

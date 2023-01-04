@@ -8,3 +8,4 @@ venv
 postgres_data
 alembic.ini
 .pytest_cache
+celerybeat-schedule

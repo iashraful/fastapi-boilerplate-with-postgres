@@ -16,7 +16,7 @@
 * `$ docker-compose up --build -d`
 * Create databases by logging into the container of db. Use the following commands
 ```
-$ docker-compose exec backend sh
+$ docker-compose exec db sh
 
 # su - postgres
 $ psql
@@ -25,7 +25,12 @@ $ psql
 # \password
 Enter new password for user postgres: *****
 ```
-* Again re run the `$ docker-compose up --build -d`
+* Copy the `alembic.ini.example` file to `alembic.ini`.
+* SSH to the container and run migration command,
+```shell
+./migrate.sh
+```
+* Again re-run the `$ docker-compose up --build -d`
 * To run the tests run the following command,
 ```sh
 $ docker-compose exec backend sh

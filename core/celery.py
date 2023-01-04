@@ -3,6 +3,7 @@ from pkgutil import iter_modules
 
 from celery import Celery
 
+from core.celery_beat_schedule import CELERY_BEAT_SCHEDULE
 from core.config import settings
 
 
@@ -15,6 +16,8 @@ celery = Celery(
     __name__, broker=settings.CELERY_BROKER, backend=settings.CELERY_BACKEND
 )
 celery.autodiscover_tasks(find_task_modules())
+celery.conf.beat_schedule = CELERY_BEAT_SCHEDULE
+celery.conf.timezone = "UTC"
 
 
 @celery.task(bind=True)
