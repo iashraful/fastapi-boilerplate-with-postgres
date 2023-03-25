@@ -17,12 +17,12 @@ class UserRepo(BaseSQLAlchemyRepo):
     def __init__(self, db: DBClient) -> None:
         super(UserRepo, self).__init__(model=User, db=db)
 
-    async def get_by_email(self, email: EmailStr) -> User:
+    async def get_by_email(self, email: EmailStr) -> UserSchema:
         logger.info(f"Retriving user by email: {email}")
-        result = await self.get(filters=(User.email == email,))
+        result: dict = await self.get(filters=(User.email == email,))
         if not result:
             raise DoesNotExistError("User with this email does not exist.")
-        return result
+        return UserSchema(**result)
 
     async def create_user(self, user_data: UserCreateSchema) -> UserSchema:
         logger.info("Creating user.")
@@ -51,5 +51,5 @@ class UserRepo(BaseSQLAlchemyRepo):
 
     async def list_users(self) -> List[UserSchema]:
         logger.info("Fetching users from db.")
-        result: List[UserSchema] = await self.list()
+        result: List[dict] = await self.list()
         return [UserSchema(**res) for res in result]
