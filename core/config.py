@@ -1,6 +1,7 @@
-from typing import List, Union
+from typing import List, Union, Annotated
 import os
-from pydantic import BaseSettings, validator
+from pydantic_settings import BaseSettings
+from pydantic import field_validator, Field
 from decouple import config
 
 
@@ -15,7 +16,7 @@ class Settings(BaseSettings):
     # CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
-    CORS_ORIGINS: Union[str, List[str]] = config("CORS_ORIGINS", default=[])
+    CORS_ORIGINS: Annotated[str | List[str], Field(validate_default=True)] = config("CORS_ORIGINS", default=[])
 
     JWT_SECRET: str = config("JWT_SECRET", default="")
     JWT_ALGORITHM: str = config("JWT_ALGORITHM", default="")
@@ -40,7 +41,7 @@ class Settings(BaseSettings):
 
     DEFAULT_PAGE_LIMIT: int = 25
 
-    @validator("CORS_ORIGINS")
+    @field_validator("CORS_ORIGINS")
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]

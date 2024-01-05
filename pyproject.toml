@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "fastapi-boilerplate-with-postgres"
+version = "0.0.1"
+description = "FastAPI Boilerplate with Postgres(async, alaembic and many more)"
+authors = ["Mohammad Ashraful <a5hraful@outlook.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.108.0"
+pydantic = "^2.5.3"
+pydantic-settings = "^2.1.0"
+python-decouple = "^3.8"
+
+[tool.poetry.group.dev.dependencies]
+uvicorn = "^0.25.0"
+black = "^23.12.1"
+alembic = "^1.13.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
